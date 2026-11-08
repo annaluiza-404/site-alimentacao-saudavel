@@ -1,7 +1,17 @@
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const brl=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),2400)}
+const store={get(k){try
+    {return JSON.parse(localStorage.getItem(k))}
+    catch(e){return null}},set(k,v)
+    {try{localStorage.setItem(k,JSON.stringify(v))}
+    catch(e){}}};
+
+function toast(m){const t=$("#toast");
+    t.textContent=m;
+    t.classList.add("show");
+    clearTimeout(toast.h);
+    toast.h=setTimeout(()=>t.classList.remove("show"),2400)}
+
 const pic=(src,fb,alt)=>`<img src="${src}" alt="${alt}" loading="lazy" onerror="this.replaceWith(document.createTextNode('${fb}'))">`;
 let cart=store.get("iz_cart")||[],user=store.get("iz_user");
 
@@ -10,21 +20,42 @@ const card=p=>`<div class="card"><div class="img">${pic(p.img,p.e,p.n)}</div><di
 <div class="row price"><span>${brl(p.p)}</span><button class="btn sm" data-add="${p.id}">Adicionar</button></div></div></div>`;
 const postCard=b=>`<a class="card post" href="post.html?id=${b.id}"><div class="img">${pic(b.img,b.e,b.t)}</div><div class="body"><span class="tag" style="align-self:flex-start">${b.cat}</span><h3>${b.t}</h3><small>${b.d}</small></div></a>`;
 
-/* Carrinho (compartilhado entre as páginas via localStorage) */
 function renderCart(){
- $("#count").textContent=cart.reduce((s,i)=>s+i.q,0);
- $("#cartList").innerHTML=cart.length?cart.map(i=>{const p=P.find(x=>x.id===i.id);return `<div class="item"><div class="e">${pic(p.img,p.e,p.n)}</div><div class="i"><b>${p.n}</b><br><small>${brl(p.p)}</small></div><div class="qty"><button data-dec="${p.id}">−</button>${i.q}<button data-add="${p.id}" data-quiet="1">+</button></div></div>`}).join(""):`<p class="empty">Seu carrinho está vazio 🌱</p>`;
- $("#total").textContent=brl(cart.reduce((s,i)=>s+i.q*P.find(x=>x.id===i.id).p,0));
+    $("#count").textContent=cart.reduce((s,i)=>s+i.q,0);
+    $("#cartList").innerHTML=cart.length?cart.map(i=>{const p=P.find(x=>x.id===i.id);return `<div class="item"><div class="e">${pic(p.img,p.e,p.n)}</div><div class="i"><b>${p.n}</b><br><small>${brl(p.p)}</small></div><div class="qty"><button data-dec="${p.id}">−</button>${i.q}<button data-add="${p.id}" data-quiet="1">+</button></div></div>`}).join(""):`<p class="empty">Seu carrinho está vazio 🌱</p>`;
+    $("#total").textContent=brl(cart.reduce((s,i)=>s+i.q*P.find(x=>x.id===i.id).p,0));
 }
 const saveCart=()=>store.set("iz_cart",cart);
-function add(id,quiet){const i=cart.find(x=>x.id===id);i?i.q++:cart.push({id,q:1});saveCart();renderCart();if(!quiet)toast("Adicionado ao carrinho ✔")}
-function dec(id){const i=cart.find(x=>x.id===id);if(!i)return;if(--i.q<=0)cart=cart.filter(x=>x!==i);saveCart();renderCart()}
-const openCart=o=>{$("#drawer").classList.toggle("open",o);$("#scrim").classList.toggle("open",o)};
-$("#cartBtn").onclick=()=>openCart(true);$("#closeCart").onclick=$("#scrim").onclick=()=>openCart(false);
+
+function add(id,quiet){
+    const i=cart.find(x=>x.id===id);
+    i?i.q++:cart.push({id,q:1});saveCart();
+    renderCart();
+    if(!quiet)toast("Adicionado ao carrinho ✔")
+}
+
+function dec(id){
+    const i=cart.find(x=>x.id===id);
+    if(!i)return;if(--i.q<=0)cart=cart.filter(x=>x!==i);
+    saveCart();
+    renderCart()
+}
+
+const openCart=o=>{$("#drawer").classList.toggle("open",o);
+    $("#scrim").classList.toggle("open",o)};
+$("#cartBtn").onclick=()=>openCart(true);
+$("#closeCart").onclick=$("#scrim").onclick=()=>openCart(false);
 $("#checkout").onclick=()=>{
- if(!cart.length)return toast("Seu carrinho está vazio");
- if(!user){store.set("iz_flash","Entre para finalizar a compra");location.href="entrar.html";return}
- cart=[];saveCart();renderCart();openCart(false);toast("Pedido realizado! Obrigado, "+user.name.split(" ")[0]+" 💚")};
+ if(!cart.length)
+    return toast("Seu carrinho está vazio");
+ if(!user){store.set("iz_flash","Entre para finalizar a compra");location.href="entrar.html";
+    return}
+ cart=[];
+ saveCart();
+ renderCart();
+ openCart(false);
+ toast("Pedido realizado! Obrigado, "+user.name.split(" ")[0]+" 💚")};
+
 document.addEventListener("click",e=>{
  const a=e.target.closest("[data-add]");if(a)return add(+a.dataset.add,a.dataset.quiet);
  const d=e.target.closest("[data-dec]");if(d)dec(+d.dataset.dec)});
@@ -39,21 +70,23 @@ function authUI(){
  if(user){$("#hello").textContent="Olá, "+user.name.split(" ")[0]+"!";$("#uinfo").textContent=user.email+" · Preferência: "+user.r}
 }
 
-/* ---------- Páginas ---------- */
 function initHome(){
  $("#chips").innerHTML=[["sg","🌾"],["sl","🥛"],["vg","🌱"],["sa","🍬"],["so","🥚"]].map(([k,e])=>`<a class="chip" href="catalogo.html?tag=${k}"><b>${e}</b>${TAGS[k]}</a>`).join("");
  $("#featured").innerHTML=P.filter(p=>[1,4,7,12].includes(p.id)).map(card).join("");
  $("#homeBlog").innerHTML=POSTS.slice(0,3).map(postCard).join("");
  $("#newsForm").onsubmit=e=>{e.preventDefault();e.target.reset();toast("Inscrição confirmada! 💌")};
 }
+
 function initShop(){
  const u=new URLSearchParams(location.search);
  const fresh=()=>({tags:new Set(u.get("tag")&&TAGS[u.get("tag")]?[u.get("tag")]:[]),cat:"",q:u.get("q")||"",pr:60,ord:"rel"});
  let st=fresh();
- const drawF=()=>{
+
+const drawF=()=>{
   $("#tagF").innerHTML=Object.entries(TAGS).map(([k,v])=>`<label class="check"><input type="checkbox" value="${k}" ${st.tags.has(k)?"checked":""}> ${v}</label>`).join("");
   $("#cat").innerHTML=`<option value="">Todas</option>`+CATS.map((c,i)=>`<option value="${i}" ${String(i)===st.cat?"selected":""}>${c}</option>`).join("");
   $("#q").value=st.q;$("#pr").value=st.pr;$("#ord").value=st.ord;$("#pv").textContent=brl(+st.pr)};
+ 
  const drawL=()=>{
   let r=P.filter(p=>[...st.tags].every(t=>p.t.includes(t))&&(st.cat===""||p.c===+st.cat)&&p.p<=st.pr&&p.n.toLowerCase().includes(st.q.toLowerCase()));
   if(st.ord==="asc")r.sort((a,b)=>a.p-b.p);if(st.ord==="desc")r.sort((a,b)=>b.p-a.p);if(st.ord==="az")r.sort((a,b)=>a.n.localeCompare(b.n,"pt-BR"));
@@ -67,6 +100,7 @@ function initShop(){
  $("#clear").onclick=()=>{st={tags:new Set(),cat:"",q:"",pr:60,ord:"rel"};drawF();drawL()};
  drawF();drawL();
 }
+
 function initAuth(){
  const err=(el,m)=>{el.parentElement.querySelector(".err").textContent=m||"";return !m};
  const okMail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);

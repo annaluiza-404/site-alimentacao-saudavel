@@ -1,5 +1,3 @@
-/* Dados do site. Para usar suas próprias fotos, troque o campo "img" por um caminho local
-   (ex.: "img/produtos/pao-de-forma.jpg"). */
 const ph=(kw,lock,w=600,h=450)=>`https://loremflickr.com/${w}/${h}/${kw}?lock=${lock}`;
 const TAGS={sg:"Sem glúten",sl:"Sem lactose",vg:"Vegano",sa:"Sem açúcar",so:"Sem ovo"};
 const CATS=["Pães e massas","Doces e biscoitos","Snacks","Bebidas","Mercearia"];

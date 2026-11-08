@@ -9,42 +9,81 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="catalogo">
-<header><div class="wrap bar">
+<header>
+  <div class="wrap bar">
 
-<a class="logo" href="index.html">
-  <img src="/images/logo.png" alt="Logo Intolerância Zero" class="logo-img">
-  Intolerância Zero
-</a>
+    <a class="logo" href="index.html">
+      <img src="/images/logo.png" alt="Logo Intolerância Zero" class="logo-img">
+      Intolerância Zero
+    </a>
 
-<nav id="nav"><a href="index.html">Início</a><a href="catalogo.html" class="on">Catálogo</a><a href="blog.html">Blog</a><a href="entrar.html" id="navLogin">Entrar</a></nav>
-<div class="tools">
-<button class="icon" id="theme" title="Alternar tema" aria-label="Alternar tema">🌓</button>
-<button class="icon" id="cartBtn" aria-label="Carrinho">🛒<span class="badge" id="count">0</span></button>
-<button class="icon menu-btn" id="menu" aria-label="Menu">☰</button>
-</div></div></header>
+    <nav id="nav">
+      <a href="index.html">Início</a>
+      <a href="catalogo.html" class="on">Catálogo</a>
+      <a href="blog.html">Blog</a>
+      <a href="entrar.html" id="navLogin">Entrar</a>
+    </nav>
+
+    <div class="tools">
+      <button class="icon" id="cartBtn" aria-label="Carrinho">🛒<span class="badge" id="count">0</span></button>
+      <button class="icon menu-btn" id="menu" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
 <main>
-<div class="page-title"><div class="wrap"><h1>Catálogo</h1><p style="margin:0;color:var(--muted)">Filtre por restrição alimentar, categoria e preço.</p></div></div>
-<div class="wrap shop">
-<aside class="filters">
-<div><h4>Buscar</h4><input id="q" type="search" placeholder="Ex.: pão, cookie…"></div>
-<div><h4>Restrições</h4><div id="tagF"></div></div>
-<div><h4>Categoria</h4><select id="cat"></select></div>
-<div><h4>Preço até <b id="pv"></b></h4><input id="pr" type="range" min="10" max="60" step="1" value="60" style="padding:0;accent-color:var(--brand)"></div>
-<div><h4>Ordenar</h4><select id="ord"><option value="rel">Relevância</option><option value="asc">Menor preço</option><option value="desc">Maior preço</option><option value="az">Nome (A–Z)</option></select></div>
-<button class="btn ghost sm" id="clear">Limpar filtros</button>
-</aside>
-<div><p class="meta" id="res"></p><div class="grid" id="list"></div></div>
-</div></main>
-<footer><div class="wrap"><div><h4>🌿 Intolerância Zero</h4><p>Alimentação saudável sem restrições ao sabor.</p></div>
-<div><h4>Navegue</h4><a href="catalogo.html">Catálogo</a><br><a href="blog.html">Blog</a><br><a href="entrar.html">Minha conta</a></div>
-<div><h4>Atendimento</h4>contato@intoleranciazero.com.br<br>Seg a sex, 9h às 18h</div></div></footer>
-<div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer"><div class="row"><h2 style="margin:0">Seu carrinho</h2><button class="icon" id="closeCart" aria-label="Fechar">✕</button></div>
-<div class="list" id="cartList"></div>
-<div class="row" style="margin:14px 0"><b>Total</b><b id="total" style="font-size:1.3rem"></b></div>
-<button class="btn" id="checkout" style="justify-content:center">Finalizar compra</button></aside>
-<div class="toast" id="toast"></div>
-<script src="js/data.js"></script>
-<script src="js/app.js"></script>
+  <div class="page-title">
+    <div class="wrap"><h1>Catálogo</h1><p style="margin:0;color:var(--muted)">Filtre por restrição alimentar, categoria e preço.</p></div></div>
+    <div class="wrap shop">
+      <aside class="filters">
+        <div><h4>Buscar</h4><input id="q" type="search" placeholder="Ex.: pão, cookie…"></div>
+        <div><h4>Restrições</h4><div id="tagF"></div></div>
+        <div><h4>Categoria</h4><select id="cat"></select></div>
+        <div><h4>Preço até <b id="pv"></b></h4><input id="pr" type="range" min="10" max="60" step="1" value="60" style="padding:0;accent-color:var(--brand)"></div>
+        <div><h4>Ordenar</h4><select id="ord"><option value="rel">Relevância</option><option value="asc">Menor preço</option><option value="desc">Maior preço</option><option value="az">Nome (A–Z)</option></select></div>
+        <button class="btn ghost sm" id="clear">Limpar filtros</button>
+      </aside>
+      <div><p class="meta" id="res"></p><div class="grid" id="list"></div>
+    </div>
+  </div>
+</main>
+
+    <footer>
+        <div class="wrap">
+            <div>
+                <h4>Intolerância Zero</h4>
+                <p>Alimentação saudável sem restrições.</p>
+            </div>
+            <div>
+                <h4>Navegue</h4>
+                <a href="catalogo.html">Catálogo</a><br>
+                <a href="blog.html">Blog</a><br>
+                <a href="entrar.html">Minha conta</a>
+            </div>
+            <div>
+                <h4>Atendimento</h4>
+                <p>contato@intoleranciazero.com.br</p>
+                <p>Seg a sex, 9h às 18h</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="scrim" id="scrim"></div>
+
+    <aside class="drawer" id="drawer">
+        <div class="row">
+            <h2 style="margin:0">Seu carrinho</h2>
+            <button class="icon" id="closeCart" aria-label="Fechar">✕</button>
+        </div>
+        <div class="list" id="cartList"></div>
+        <div class="row" style="margin:14px 0">
+            <b>Total</b><b id="total" style="font-size:1.3rem"></b>
+        </div>
+        <button class="btn" id="checkout" style="justify-content:center">Finalizar compra</button>
+    </aside>
+    <div class="toast" id="toast"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>

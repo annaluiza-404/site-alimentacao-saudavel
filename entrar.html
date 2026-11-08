@@ -10,44 +10,110 @@
 </head>
 
 <body data-page="entrar">
-<header><div class="wrap bar">
+<header>
+  <div class="wrap bar">
 
-<a class="logo" href="index.html">
-  <img src="/images/logo.png" alt="Logo Intolerância Zero" class="logo-img">
-  Intolerância Zero
-</a>
+    <a class="logo" href="index.html">
+      <img src="/images/logo.png" alt="Logo Intolerância Zero" class="logo-img">
+      Intolerância Zero
+    </a>
 
-<nav id="nav"><a href="index.html">Início</a><a href="catalogo.html">Catálogo</a><a href="blog.html">Blog</a><a href="entrar.html" class="on" id="navLogin">Entrar</a></nav>
-<div class="tools">
-<button class="icon" id="theme" title="Alternar tema" aria-label="Alternar tema">🌓</button>
-<button class="icon" id="cartBtn" aria-label="Carrinho">🛒<span class="badge" id="count">0</span></button>
-<button class="icon menu-btn" id="menu" aria-label="Menu">☰</button>
-</div></div></header>
-<main><div class="wrap">
-<div class="auth" id="authBox">
-<div class="tabs"><button class="on" data-t="in">Entrar</button><button data-t="up">Criar conta</button></div>
-<form id="fIn" novalidate>
-<div class="field"><label for="li-e">E-mail</label><input id="li-e" type="email" autocomplete="email"><div class="err"></div></div>
-<div class="field"><label for="li-s">Senha</label><input id="li-s" type="password" autocomplete="current-password"><div class="err"></div></div>
-<button class="btn" style="width:100%;justify-content:center">Entrar</button></form>
-<form id="fUp" novalidate hidden>
-<div class="field"><label for="su-n">Nome</label><input id="su-n" autocomplete="name"><div class="err"></div></div>
-<div class="field"><label for="su-e">E-mail</label><input id="su-e" type="email" autocomplete="email"><div class="err"></div></div>
-<div class="field"><label for="su-s">Senha (mín. 6 caracteres)</label><input id="su-s" type="password" autocomplete="new-password"><div class="err"></div></div>
-<div class="field"><label for="su-r">Restrição principal</label><select id="su-r"><option>Sem glúten</option><option>Sem lactose</option><option>Vegano</option><option>Sem açúcar</option><option>Outra</option></select></div>
-<button class="btn" style="width:100%;justify-content:center">Criar conta</button></form>
-</div>
-<div class="auth" id="userBox" hidden style="text-align:center"><div style="font-size:3rem">🌱</div><h2 id="hello"></h2><p class="meta" id="uinfo"></p><a class="btn" href="catalogo.html">Ir às compras</a> <button class="btn ghost" id="logout">Sair</button></div>
-</div></main>
-<footer><div class="wrap"><div><h4>🌿 Intolerância Zero</h4><p>Alimentação saudável sem restrições ao sabor.</p></div>
-<div><h4>Navegue</h4><a href="catalogo.html">Catálogo</a><br><a href="blog.html">Blog</a><br><a href="entrar.html">Minha conta</a></div>
-<div><h4>Atendimento</h4>contato@intoleranciazero.com.br<br>Seg a sex, 9h às 18h</div></div></footer>
+    <nav id="nav">
+      <a href="index.html">Início</a><a href="catalogo.html">Catálogo</a>
+      <a href="blog.html">Blog</a><a href="entrar.html" class="on" id="navLogin">Entrar</a>
+    </nav>
+    
+    <div class="tools">
+      <button class="icon" id="theme" title="Alternar tema" aria-label="Alternar tema">🌓</button>
+      <button class="icon" id="cartBtn" aria-label="Carrinho">🛒<span class="badge" id="count">0</span></button>
+      <button class="icon menu-btn" id="menu" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="auth" id="authBox">
+      <div class="tabs">
+        <button class="on" data-t="in">Entrar</button>
+        <button data-t="up">Criar conta</button>
+      </div>
+      <form id="fIn" novalidate>
+        <div class="field"><label for="li-e">E-mail</label>
+          <input id="li-e" type="email" autocomplete="email">
+          <div class="err"></div>
+        </div>
+        <div class="field"><label for="li-s">Senha</label>
+          <input id="li-s" type="password" autocomplete="current-password">
+          <div class="err"></div>
+        </div>
+        <button class="btn" style="width:100%;justify-content:center">Entrar</button>
+      </form>
+
+      <form id="fUp" novalidate hidden>
+      <div class="field"><label for="su-n">Nome</label>
+        <input id="su-n" autocomplete="name">
+        <div class="err"></div>
+      </div>
+      <div class="field"><label for="su-e">E-mail</label>
+        <input id="su-e" type="email" autocomplete="email">
+        <div class="err"></div>
+      </div>
+      <div class="field"><label for="su-s">Senha (mín. 6 caracteres)</label>
+        <input id="su-s" type="password" autocomplete="new-password">
+        <div class="err"></div>
+      </div>
+      <div class="field"><label for="su-r">Restrição principal</label>
+        <select id="su-r">
+          <option>Sem glúten</option>
+          <option>Sem lactose</option>
+          <option>Vegano</option>
+          <option>Sem açúcar</option>
+          <option>Outra</option>
+        </select>
+      </div>
+      <button class="btn" style="width:100%;justify-content:center">Criar conta</button>
+    </form>
+    </div>
+    <div class="auth" id="userBox" hidden style="text-align:center"><div style="font-size:3rem">🌱</div><h2 id="hello"></h2><p class="meta" id="uinfo"></p><a class="btn" href="catalogo.html">Ir às compras</a> <button class="btn ghost" id="logout">Sair</button></div>
+  </div>
+</main>
+
+<footer>
+    <div class="wrap">
+        <div>
+            <h4>Intolerância Zero</h4>
+            <p>Alimentação saudável sem restrições.</p>
+        </div>
+        <div>
+            <h4>Navegue</h4>
+            <a href="catalogo.html">Catálogo</a><br>
+            <a href="blog.html">Blog</a><br>
+            <a href="entrar.html">Minha conta</a>
+        </div>
+        <div>
+            <h4>Atendimento</h4>
+            <p>contato@intoleranciazero.com.br</p>
+            <p>Seg a sex, 9h às 18h</p>
+        </div>
+    </div>
+</footer>
+
 <div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer"><div class="row"><h2 style="margin:0">Seu carrinho</h2><button class="icon" id="closeCart" aria-label="Fechar">✕</button></div>
-<div class="list" id="cartList"></div>
-<div class="row" style="margin:14px 0"><b>Total</b><b id="total" style="font-size:1.3rem"></b></div>
-<button class="btn" id="checkout" style="justify-content:center">Finalizar compra</button></aside>
+
+<aside class="drawer" id="drawer">
+    <div class="row">
+        <h2 style="margin:0">Seu carrinho</h2>
+        <button class="icon" id="closeCart" aria-label="Fechar">✕</button>
+    </div>
+    <div class="list" id="cartList"></div>
+    <div class="row" style="margin:14px 0">
+        <b>Total</b><b id="total" style="font-size:1.3rem"></b>
+    </div>
+    <button class="btn" id="checkout" style="justify-content:center">Finalizar compra</button>
+</aside>
 <div class="toast" id="toast"></div>
+
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
 </body>
