@@ -12,7 +12,8 @@ function toast(m){const t=$("#toast");
     clearTimeout(toast.h);
     toast.h=setTimeout(()=>t.classList.remove("show"),2400)}
 
-const pic=(src,fb,alt)=>`<img src="${src}" alt="${alt}" loading="lazy" onerror="this.replaceWith(document.createTextNode('${fb}'))">`;
+window.imgFail=img=>{const s=document.createElement("span");s.textContent=img.dataset.fb;s.style.cssText="display:grid;place-items:center;width:100%;height:100%;min-height:120px;font-size:3rem";img.replaceWith(s)};
+const pic=(src,fb,alt)=>`<img src="${src}" alt="${alt}" data-fb="${fb}" loading="lazy" onerror="imgFail(this)">`;
 let cart=store.get("iz_cart")||[],user=store.get("iz_user");
 
 const card=p=>`<div class="card"><div class="img">${pic(p.img,p.e,p.n)}</div><div class="body"><small>${CATS[p.c]}</small><h3>${p.n}</h3>
@@ -60,8 +61,6 @@ document.addEventListener("click",e=>{
  const a=e.target.closest("[data-add]");if(a)return add(+a.dataset.add,a.dataset.quiet);
  const d=e.target.closest("[data-dec]");if(d)dec(+d.dataset.dec)});
 $("#menu").onclick=()=>$("#nav").classList.toggle("open");
-$("#theme").onclick=()=>{const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=dark?"light":"dark";store.set("iz_theme",r.dataset.theme)};
-if(store.get("iz_theme"))document.documentElement.dataset.theme=store.get("iz_theme");
 
 function authUI(){
  $("#navLogin").textContent=user?"Olá, "+user.name.split(" ")[0]:"Entrar";
@@ -71,10 +70,18 @@ function authUI(){
 }
 
 function initHome(){
- $("#chips").innerHTML=[["sg","🌾"],["sl","🥛"],["vg","🌱"],["sa","🍬"],["so","🥚"]].map(([k,e])=>`<a class="chip" href="catalogo.html?tag=${k}"><b>${e}</b>${TAGS[k]}</a>`).join("");
+$("#chips").innerHTML=[
+  ["sg","images/chips/sem-gluten.png","🌾"],
+  ["sl","images/chips/sem-lactose.png","🥛"],
+  ["vg","images/chips/vegano.png","🌱"],
+  ["sa","images/chips/sem-acucar.png","🍬"],
+  ["so","images/chips/sem-ovo.png","🥚"]
+].map(([k,img,e])=>`<a class="chip" href="catalogo.html?tag=${k}"><b>${pic(img,e,TAGS[k])}</b>${TAGS[k]}</a>`).join("");
  $("#featured").innerHTML=P.filter(p=>[1,4,7,12].includes(p.id)).map(card).join("");
- $("#homeBlog").innerHTML=POSTS.slice(0,3).map(postCard).join("");
- $("#newsForm").onsubmit=e=>{e.preventDefault();e.target.reset();toast("Inscrição confirmada! 💌")};
+ const homeBlog=$("#homeBlog");
+ if(homeBlog)homeBlog.innerHTML=POSTS.slice(0,3).map(postCard).join("");
+ const newsForm=$("#newsForm");
+ if(newsForm)newsForm.onsubmit=e=>{e.preventDefault();e.target.reset();toast("Inscrição confirmada! 💌")};
 }
 
 function initShop(){
