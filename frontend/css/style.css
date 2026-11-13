@@ -163,12 +163,11 @@ section.page{display:none;animation:in .35s ease}section.page.show{display:block
 .hero{
     background:
     linear-gradient(to right, #f8f5e9 30%, rgba(237, 223, 199, 0) 100%),
-    url('/images/inicial.png') no-repeat center center;
+    url('../images/inicial.png') no-repeat center center / cover;
     color: #173f2b;
     padding: 72px 0 80px;
     overflow: hidden;
 }
-
 .hero .wrap{display:grid;
     grid-template-columns:1.2fr .8fr;
     gap:32px;align-items:center}
