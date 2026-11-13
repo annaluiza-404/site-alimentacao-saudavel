@@ -3,23 +3,22 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Blog — Intolerância Zero</title>
+    <title>Intolerância Zero — Alimentos sem glúten, sem lactose e muito mais</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body data-page="post">
+<body data-page="inicio">
     <header>
         <div class="wrap bar">
             <a class="logo" href="index.html">
-                <img src="/images/logo.png" alt="Logo Intolerância Zero" class="logo-img">Intolerância Zero
+                <img src="images/logo.png" alt="Logo Intolerância Zero" class="logo-img"> Intolerância Zero
             </a>
-
             <nav id="nav">
-                <a href="index.html">Início</a>
+                <a href="index.html" class="on">Início</a>
                 <a href="catalogo.html">Catálogo</a>
-                <a href="blog.html" class="on">Blog</a>
+                <a href="blog.html">Blog</a>
                 <a href="entrar.html" id="navLogin">Entrar</a>
             </nav>
             <div class="tools">
@@ -30,7 +29,32 @@
     </header>
 
     <main>
-        <article class="article" id="article"></article>
+        <div class="hero">
+            <div class="wrap">
+                <div>
+                    <h1>Comer bem sem medo de <em>restrições</em>.</h1>
+                    <p>Alimentos selecionados, sem glúten, sem lactose, veganos e sem açúcar, com rótulos claros e de qualidade.</p>
+                    <p style="display:flex;gap:12px;flex-wrap:wrap">
+                        <a class="btn" href="catalogo.html">Ver catálogo →</a>
+                        <a class="btn ghost" href="blog.html">Ler o blog</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="wrap pad">
+            <div class="head"><h2>Receitas, dicas e novidades para você!</h2></div>
+            <div class="chips" id="chips"></div>
+        </div>
+
+        <div class="wrap">
+            <div class="head">
+                <h2>Encontre o que faz bem para você</h2>
+                <a class="btn ghost sm" href="catalogo.html">Ver tudo</a>
+            </div>
+            <div class="grid" id="featured"></div>
+        </div>
+
     </main>
 
     <footer>
