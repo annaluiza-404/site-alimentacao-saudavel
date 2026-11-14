@@ -27,3 +27,20 @@ def deslogar_usuario():
 @bp_auth.route('/me', methods=['GET'])
 def coletar_usuario():
     return jsonify({"mensagem": "Rota de coletar usuario"})
+
+@bp_auth.route('/usuarios/<int:id>', methods=['PUT'])
+def atualizar_usuario(id):
+    dados = request.get_json(silent=True) or {}
+    return jsonify({
+        "usuario_id": id,
+        "nome": dados.get('nome'),
+        "cpf": dados.get('cpf'),
+        "preferencia": dados.get('preferencia')
+    })
+
+@bp_auth.route('/usuarios/<int:id>', methods=['DELETE'])
+def excluir_usuario(id):
+    return jsonify({
+        "usuario_id": id,
+        "mensagem": "Rota de excluir usuario"
+    })

@@ -15,6 +15,22 @@ def fechar_pedido():
     dados = request.get_json(silent=True) or {}
     return jsonify({
         "itens": dados.get('itens'),
-        "cep": dados.get('cep'),
-        "cupom": dados.get('cupom')
+        "endereco": dados.get('endereco'),
+        "cupom": dados.get('cupom'),
+        "forma_pagamento": dados.get('forma_pagamento')
+    })
+
+@bp_pedidos.route('/pedidos/<int:id>/status', methods=['PUT'])
+def atualizar_status_pedido(id):
+    dados = request.get_json(silent=True) or {}
+    return jsonify({
+        "pedido_id": id,
+        "status": dados.get('status')
+    })
+
+@bp_pedidos.route('/pedidos/<int:id>', methods=['DELETE'])
+def cancelar_pedido(id):
+    return jsonify({
+        "pedido_id": id,
+        "mensagem": "Rota de cancelar pedido"
     })
