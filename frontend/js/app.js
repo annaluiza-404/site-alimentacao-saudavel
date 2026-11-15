@@ -66,7 +66,12 @@ function authUI(){
  $("#navLogin").textContent=user?"Olá, "+user.name.split(" ")[0]:"Entrar";
  if(!$("#authBox"))return;
  $("#authBox").hidden=!!user;$("#userBox").hidden=!user;
- if(user){$("#hello").textContent="Olá, "+user.name.split(" ")[0]+"!";$("#uinfo").textContent=user.email+" · Preferência: "+user.r}
+ if(user){$("#hello").textContent="Olá, "+user.name.split(" ")[0]+"!";$("#uinfo").textContent=user.email+" · Preferência: "+(user.r||"—")}
+}
+async function carregarSessao(){
+ try{const d=await apiFetch("/api/me");user={name:d.usuario.nome,email:d.usuario.email,admin:d.usuario.admin,r:d.usuario.preferencia};store.set("iz_user",user)}
+ catch(e){user=null;store.set("iz_user",null)}
+ authUI()
 }
 
 function initHome(){
@@ -113,16 +118,18 @@ function initAuth(){
  const okMail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
  const login=(u,msg)=>{user=u;store.set("iz_user",u);store.set("iz_flash",msg);location.href="catalogo.html"};
  $$(".tabs button").forEach(b=>b.onclick=()=>{$$(".tabs button").forEach(x=>x.classList.toggle("on",x===b));$("#fIn").hidden=b.dataset.t!=="in";$("#fUp").hidden=b.dataset.t!=="up"});
- $("#fUp").onsubmit=e=>{e.preventDefault();const n=$("#su-n"),m=$("#su-e"),s=$("#su-s");
+ $("#fUp").onsubmit=async e=>{e.preventDefault();const n=$("#su-n"),m=$("#su-e"),s=$("#su-s");
   const v=[err(n,n.value.trim().length<2?"Informe seu nome":""),err(m,okMail(m.value)?"":"E-mail inválido"),err(s,s.value.length<6?"Mínimo de 6 caracteres":"")];
-  if(v.includes(false))return;const users=store.get("iz_users")||[];
-  if(users.some(x=>x.email===m.value.toLowerCase()))return err(m,"E-mail já cadastrado");
-  const u={name:n.value.trim(),email:m.value.toLowerCase(),pass:s.value,r:$("#su-r").value};users.push(u);store.set("iz_users",users);login(u,"Conta criada! Bem-vindo(a) 🌿")};
- $("#fIn").onsubmit=e=>{e.preventDefault();const m=$("#li-e"),s=$("#li-s");
+  if(v.includes(false))return;
+  try{const d=await apiFetch("/api/registro",{metodo:"POST",corpo:{nome:n.value.trim(),email:m.value.toLowerCase(),senha:s.value,preferencia:$("#su-r").value}});
+   login({name:d.usuario.nome,email:d.usuario.email,admin:d.usuario.admin,r:d.usuario.preferencia},"Conta criada! Bem-vindo(a) 🌿")}
+  catch(ex){err(m,ex.message)}};
+ $("#fIn").onsubmit=async e=>{e.preventDefault();const m=$("#li-e"),s=$("#li-s");
   if(!err(m,okMail(m.value)?"":"E-mail inválido")|!err(s,s.value?"":"Informe a senha"))return;
-  const u=(store.get("iz_users")||[]).find(x=>x.email===m.value.toLowerCase()&&x.pass===s.value);
-  if(!u)return err(s,"E-mail ou senha incorretos");login(u,"Olá de novo, "+u.name.split(" ")[0]+"!")};
- $("#logout").onclick=()=>{user=null;store.set("iz_user",null);authUI();toast("Você saiu da conta")};
+  try{const d=await apiFetch("/api/login",{metodo:"POST",corpo:{email:m.value.toLowerCase(),senha:s.value}});
+   login({name:d.usuario.nome,email:d.usuario.email,admin:d.usuario.admin,r:d.usuario.preferencia},"Olá de novo, "+d.usuario.nome.split(" ")[0]+"!")}
+  catch(ex){err(s,ex.message)}};
+ $("#logout").onclick=async()=>{try{await apiFetch("/api/logout",{metodo:"POST"})}catch(e){}user=null;store.set("iz_user",null);authUI();toast("Você saiu da conta")};
 }
 function initBlog(){$("#blogList").innerHTML=POSTS.map(postCard).join("")}
 function initPost(){
@@ -131,6 +138,6 @@ function initPost(){
  $("#article").innerHTML=b?`<a class="back" href="blog.html">← Voltar ao blog</a><div class="cover">${pic(b.img,b.e,b.t)}</div><span class="tag">${b.cat}</span><h1 style="margin-top:12px">${b.t}</h1><p class="meta">${b.d} · Equipe Intolerância Zero</p>${b.ps.map(x=>`<p>${x}</p>`).join("")}<p><a class="btn" href="catalogo.html">Ver produtos relacionados</a></p>`:`<a class="back" href="blog.html">← Blog</a><p>Post não encontrado.</p>`;
 }
 
-renderCart();authUI();
+renderCart();authUI();carregarSessao();
 ({inicio:initHome,catalogo:initShop,entrar:initAuth,blog:initBlog,post:initPost}[document.body.dataset.page]||(()=>{}))();
 const flash=store.get("iz_flash");if(flash){store.set("iz_flash",null);toast(flash)}
