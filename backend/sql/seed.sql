@@ -111,8 +111,8 @@ INSERT INTO cupons (codigo, valor_desconto, tipo_desconto, minimo_subtotal, data
 ('EXPIRADO10', 10.00, 'percentual', 0, '2026-10-31');
 
 INSERT INTO usuarios (nome, email, cpf, senha, preferencia, admin) VALUES
-('Admin Intolerância Zero', 'admin@intoleranciazero.com', '529.982.247-76', 'admin123', NULL, TRUE),
-('Maria Silva', 'maria@email.com', NULL, 'maria123', 'Sem lactose', FALSE);
+('Admin Intolerância Zero', 'admin@intoleranciazero.com', '123.456.789-09', '$2b$12$PYB//I3i1JDN4FOx2JTSXujimJf1099MxbVuaqtBYhpCVi8oqdx2S', NULL, TRUE),
+('Maria Silva', 'maria@email.com', NULL, '$2b$12$BGDVSWL8KmtNZyawqH.w/.LyyBVn6CLLcUNRekTiPMgP/UfzTouce', 'Sem lactose', FALSE);
 
 INSERT INTO enderecos (usuario_id, cep, logradouro, numero, complemento, bairro, cidade, estado)
 SELECT u.id, v.cep, v.logradouro, v.numero, v.complemento, v.bairro, v.cidade, v.estado

@@ -22,3 +22,4 @@ def carregar(app):
         'user': os.environ.get('DB_USER', 'iz_app'),
         'senha': os.environ.get('DB_PASS', 'iz_dev_password')
     }
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'iz-dev-secret-key')
