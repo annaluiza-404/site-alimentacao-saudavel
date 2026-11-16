@@ -20,7 +20,7 @@
 
     <nav id="nav">
       <a href="index.html">Início</a><a href="catalogo.html">Catálogo</a>
-      <a href="blog.html">Blog</a><a href="entrar.html" class="on" id="navLogin">Entrar</a>
+      <a href="blog.html">Blog</a><a href="pedidos.html">Meus pedidos</a><a href="entrar.html" class="on" id="navLogin">Entrar</a>
     </nav>
     
     <div class="tools">
@@ -74,7 +74,29 @@
       <button class="btn" style="width:100%;justify-content:center">Criar conta</button>
     </form>
     </div>
-    <div class="auth" id="userBox" hidden style="text-align:center"><div style="font-size:3rem">🌱</div><h2 id="hello"></h2><p class="meta" id="uinfo"></p><a class="btn" href="catalogo.html">Ir às compras</a> <button class="btn ghost" id="logout">Sair</button></div>
+    <div class="auth" id="userBox" hidden style="text-align:center"><div style="font-size:3rem">🌱</div><h2 id="hello"></h2><p class="meta" id="uinfo"></p><a class="btn" href="catalogo.html">Ir às compras</a> <button class="btn ghost" id="logout">Sair</button>
+      <form id="fPerfil" novalidate style="margin-top:22px;text-align:left;border-top:1px solid var(--line);padding-top:18px">
+        <div class="field"><label for="pf-nome">Nome</label>
+          <input id="pf-nome" autocomplete="name">
+          <div class="err"></div>
+        </div>
+        <div class="field"><label for="pf-cpf">CPF (obrigatório para comprar)</label>
+          <input id="pf-cpf" inputmode="numeric" placeholder="000.000.000-00">
+          <div class="err"></div>
+        </div>
+        <div class="field"><label for="pf-pref">Restrição principal</label>
+          <select id="pf-pref">
+            <option value="">Sem preferência</option>
+            <option>Sem glúten</option>
+            <option>Sem lactose</option>
+            <option>Vegano</option>
+            <option>Sem açúcar</option>
+            <option>Outra</option>
+          </select>
+        </div>
+        <button class="btn" style="width:100%;justify-content:center">Salvar dados</button>
+      </form>
+    </div>
   </div>
 </main>
 

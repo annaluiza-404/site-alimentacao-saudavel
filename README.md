@@ -6,7 +6,7 @@ E-commerce de alimentação sem glúten/lactose: frontend estático + API Flask 
 >
 > O foco da disciplina é o banco de dados: modelagem relacional e regras de negócio **diretamente no SGBD** via Stored Procedures, Triggers, Functions e Views (requisito do artigo), consumidos por uma API Flask e por um frontend estático (com ChatBot e blog de receitas, como no projeto original de Engenharia de Software II).
 >
-> Os objetos do artigo (`pr_AtualizarEstoque`, `f_ProdutosPorMarca`, `trg_BaixaEstoquePedido`, `vw_CatalogoDisponivel`, em T-SQL/MySQL) foram implementados com o mesmo espírito em **PL/pgSQL (PostgreSQL)**, em snake_case: `pr_atualizar_estoque`, `f_produtos_por_marca`, `trg_baixa_estoque_pedido`, `vw_catalogo_disponivel`.
+> Os objetos do artigo (`pr_AtualizarEstoque`, `f_ProdutosPorMarca`, `trg_BaixaEstoquePedido`, `vw_CatalogoDisponivel`, em T-SQL/MySQL) foram implementados com o mesmo espírito em **PL/pgSQL (PostgreSQL)**, em snake_case: `pr_atualizar_estoque`, `f_produtos_por_marca`, `trg_baixa_estoque_pedido`, `vw_catalogo_disponivel`. Além desses, o projeto tem a trigger `trg_repoe_estoque_cancelamento`, que devolve o estoque quando um pedido é cancelado.
 
 ## Equipe
 
@@ -82,28 +82,72 @@ Abrir `http://localhost:5000`.
 
 As portas precisam bater: a API sobe na 8000 e o CORS do backend aceita origem `http://localhost:5000`.
 
-## Usuários de teste (após `--reset`)
+## Usuários e cupons de teste (após `--reset`)
 
-| E-mail | Senha | Papel |
+| E-mail | Senha | Papel | CPF |
+|:--|:--|:--|:--|
+| `admin@intoleranciazero.com` | `admin123` | admin | já cadastrado |
+| `maria@email.com` | `maria123` | cliente | **não cadastrado** |
+
+O cliente precisa de CPF para finalizar compra (cadastro progressivo): entre em **Minha conta** e salve um CPF válido (ex.: `111.444.777-35`).
+
+Cupons: `BEMVINDO10` (10% de desconto), `FRETEGRATIS` (zera o frete, subtotal mínimo R$ 80), `EXPIRADO10` (vencido, para testar rejeição).
+
+## Regras de frete e pagamento
+
+Frete calculado pela região do CEP (primeiro dígito):
+
+| CEP começa com | Região | Frete |
 |:--|:--|:--|
-| `admin@intoleranciazero.com` | `admin123` | admin |
-| `maria@email.com` | `maria123` | cliente |
+| 0 ou 1 | São Paulo | R$ 10,00 |
+| 2 ou 3 | RJ / ES / MG | R$ 15,00 |
+| 7, 8 ou 9 | Centro-Oeste / Sul | R$ 18,00 |
+| 4, 5 ou 6 | Nordeste / Norte | R$ 22,00 |
 
-Cupons: `BEMVINDO10` (10% off), `FRETEGRATIS` (frete grátis acima de R$ 80), `EXPIRADO10` (vencido, para testar rejeição).
+Formas de pagamento: `pix`, `cartao`, `boleto`. O desconto do cupom é aplicado sobre subtotal + frete.
+
+## Endpoints principais
+
+| Área | Rotas |
+|:--|:--|
+| Auth | `POST /api/registro`, `POST /api/login`, `POST /api/logout`, `GET /api/me`, `PUT /api/usuarios/<id>` (dono ou admin) |
+| Catálogo | `GET /api/produtos` (`q`, `tags`, `cat`, `pr_max`, `ord`, `marca`, `destaque`), `GET /api/produtos/<id>`, `GET /api/produtos/destaques` |
+| Catálogo (admin) | `POST/PUT/DELETE /api/produtos` (multipart com campo `imagem`), CRUD de `/api/categorias` e `/api/marcas` |
+| Frete e cupom | `POST /api/frete` (`cep`), `POST /api/cupom/validar` (`codigo`, `subtotal`, `frete` ou `cep`) |
+| Pedidos | `GET/POST /api/pedidos`, `GET/DELETE /api/pedidos/<id>`, `PUT /api/pedidos/<id>/status` (admin) |
+| Receitas | `GET /api/receitas?produto_id=<id>`, `GET /api/receitas/<id>`, `POST/PUT/DELETE /api/receitas/<id>` (admin) |
+| Imagens | `GET /uploads/<caminho>` |
+
+Regras de acesso: escrita de catálogo, receitas e status de pedido exige admin; pedidos são visíveis apenas para o dono (admin vê todos). O checkout roda em transação única (COMMIT no sucesso, ROLLBACK em erro) e o estoque é controlado por triggers.
 
 ## Estrutura
 
 ```
 backend/
-  app.py            # app Flask + CORS + error handler
+  app.py            # app Flask + CORS + error handler global (ApiErro)
   config.py         # lê .env
-  db.py             # conexão por request + query()
-  sql/              # ddl.sql, objetos.sql (procedure/function/trigger/view), seed.sql, setup.py
-  services/         # regras de negócio (única camada com transação)
-  routes/           # blueprints "burros"
-  utils/            # validators, security (bcrypt/sessão), erros, imagens
+  db.py             # conexão por request, query() e transacao() (COMMIT/ROLLBACK)
+  sql/
+    ddl.sql         # tabelas, extensão unaccent, checks e índices
+    objetos.sql     # procedure, function, triggers (baixa e reposição) e view
+    seed.sql        # carga inicial (produtos das imagens do front, cupons, pedidos, receitas)
+    setup.py        # aplica ddl + objetos + seed
+  repositories/     # SQL puro, uma por entidade
+  services/         # regras de negócio, autorização e transações
+  routes/           # blueprints "burros" (só parse e resposta)
+  utils/            # validators, conversões, security (bcrypt/sessão), erros, imagens
   uploads/          # imagens de produtos enviadas
 frontend/
-  js/               # env.js (config), api.js (fetch), app.js, data.js
-  *.html            # páginas estáticas
-```
+  index.html        # home com destaques da API
+  catalogo.html     # catálogo com filtros
+  entrar.html       # login, cadastro e edição de perfil (CPF)
+  pedidos.html      # meus pedidos (itens e cancelamento)
+  blog.html / post.html  # blog de receitas
+  js/
+    env.js          # configuração (URL da API)
+    api.js          # fetch com cookies de sessão
+    app.js          # catálogo, carrinho, checkout e pedidos
+    data.js         # TAGs, categorias, posts do blog e emojis
+    chuchubot.js    # chatbot do site
+  css/
+``` 

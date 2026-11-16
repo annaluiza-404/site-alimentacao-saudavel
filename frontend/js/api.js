@@ -8,6 +8,10 @@ async function apiFetch(caminho, { metodo = "GET", corpo = null } = {}) {
   }
   const resp = await fetch(API + caminho, opcoes);
   const dados = await resp.json().catch(() => ({}));
-  if (!resp.ok) throw new Error(dados.erro || "Erro de conexão com o servidor");
+  if (!resp.ok) {
+    const erro = new Error(dados.erro || "Erro de conexão com o servidor");
+    erro.status = resp.status;
+    throw erro;
+  }
   return dados;
 }
