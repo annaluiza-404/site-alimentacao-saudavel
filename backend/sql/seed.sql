@@ -17,22 +17,23 @@ INSERT INTO marcas (nome) VALUES
 INSERT INTO produtos (marca_id, nome, descricao, preco, estoque_qtd, imagem_url, destaque)
 SELECT m.id, v.nome, v.descricao, v.preco, v.estoque_qtd, v.imagem_url, v.destaque
 FROM (VALUES
-('Intolerância Zero', 'Pão de forma de arroz', 'Pão de forma macio, feito com farinha de arroz', 18.90, 30, 'images/produtos/pao-arroz.jpg', TRUE),
-('Intolerância Zero', 'Macarrão de milho 500g', 'Massa de milho livre de glúten, cozimento em 8 minutos', 12.50, 40, 'images/produtos/macarrao-milho.jpg', FALSE),
-('Intolerância Zero', 'Cookie de aveia sem glúten', 'Cookie crocante de aveia certificada sem glúten', 14.90, 25, 'images/produtos/cookie-aveia.jpg', FALSE),
-('Intolerância Zero', 'Brownie de cacau 70%', 'Brownie denso de cacau 70% vegano', 21.00, 20, 'images/produtos/brownie.jpg', TRUE),
-('Intolerância Zero', 'Barrinha de castanhas', 'Barrinha de castanhas sem açúcar adicionado', 9.90, 50, 'images/produtos/barrinha-castanhas.jpg', FALSE),
-('Intolerância Zero', 'Chips de batata-doce', 'Chips crocante de batata-doce assado', 11.50, 35, 'images/produtos/chips-batata-doce.jpg', FALSE),
-('Intolerância Zero', 'Bebida de amêndoas 1L', 'Bebida vegetal de amêndoas sem açúcar', 16.90, 45, 'images/produtos/leite-amendoas.jpg', TRUE),
-('Grãos & Cia', 'Kombucha de gengibre', 'Kombucha artesanal de gengibre 500ml', 13.90, 18, 'images/produtos/kombucha-gengibre.jpg', FALSE),
-('Grãos & Cia', 'Farinha de arroz integral', 'Farinha de arroz integral para receitas sem glúten', 8.90, 60, 'images/produtos/farinha-arroz.jpg', FALSE),
-('Grãos & Cia', 'Pasta de amendoim integral', 'Pasta de amendoim integral sem açúcar', 19.90, 28, 'images/produtos/pasta-amendoim.jpg', FALSE),
-('Grãos & Cia', 'Mix de farinhas para bolo', 'Mix pronto de farinhas sem glúten para bolos', 24.90, 22, 'images/produtos/mix-farinhas.jpg', FALSE),
-('Grãos & Cia', 'Queijo vegetal de castanhas', 'Queijo vegetal de castanhas maturado 200g', 42.00, 15, 'images/produtos/queijo-castanhas.jpg', TRUE),
-('Grãos & Cia', 'Granola sem açúcar', 'Granola sem açúcar com castanhas e sementes 500g', 27.50, 26, 'images/produtos/granola.jpg', FALSE),
-('Grãos & Cia', 'Pão de queijo sem lactose', 'Pão de queijo congelado sem lactose 600g', 22.00, 32, 'images/produtos/pao-de-queijo.jpg', FALSE)
-) AS v(marca, nome, descricao, preco, estoque_qtd, imagem_url, destaque)
-JOIN marcas m ON m.nome = v.marca;
+('Intolerância Zero', 'Pão de forma de arroz', 'Pão de forma macio, feito com farinha de arroz', 18.90, 30, 'images/produtos/pao-arroz.jpg', TRUE, 1),
+('Intolerância Zero', 'Macarrão de milho 500g', 'Massa de milho livre de glúten, cozimento em 8 minutos', 12.50, 40, 'images/produtos/macarrao-milho.jpg', FALSE, 2),
+('Intolerância Zero', 'Cookie de aveia sem glúten', 'Cookie crocante de aveia certificada sem glúten', 14.90, 25, 'images/produtos/cookie-aveia.jpg', FALSE, 3),
+('Intolerância Zero', 'Brownie de cacau 70%', 'Brownie denso de cacau 70% vegano', 21.00, 20, 'images/produtos/brownie.jpg', TRUE, 4),
+('Intolerância Zero', 'Barrinha de castanhas', 'Barrinha de castanhas sem açúcar adicionado', 9.90, 50, 'images/produtos/barrinha-castanhas.jpg', FALSE, 5),
+('Intolerância Zero', 'Chips de batata-doce', 'Chips crocante de batata-doce assado', 11.50, 35, 'images/produtos/chips-batata-doce.jpg', FALSE, 6),
+('Intolerância Zero', 'Bebida de amêndoas 1L', 'Bebida vegetal de amêndoas sem açúcar', 16.90, 45, 'images/produtos/leite-amendoas.jpg', TRUE, 7),
+('Grãos & Cia', 'Kombucha de gengibre', 'Kombucha artesanal de gengibre 500ml', 13.90, 18, 'images/produtos/kombucha-gengibre.jpg', FALSE, 8),
+('Grãos & Cia', 'Farinha de arroz integral', 'Farinha de arroz integral para receitas sem glúten', 8.90, 60, 'images/produtos/farinha-arroz.jpg', FALSE, 9),
+('Grãos & Cia', 'Pasta de amendoim integral', 'Pasta de amendoim integral sem açúcar', 19.90, 28, 'images/produtos/pasta-amendoim.jpg', FALSE, 10),
+('Grãos & Cia', 'Mix de farinhas para bolo', 'Mix pronto de farinhas sem glúten para bolos', 24.90, 22, 'images/produtos/mix-farinhas.jpg', FALSE, 11),
+('Grãos & Cia', 'Queijo vegetal de castanhas', 'Queijo vegetal de castanhas maturado 200g', 42.00, 15, 'images/produtos/queijo-castanhas.jpg', TRUE, 12),
+('Grãos & Cia', 'Granola sem açúcar', 'Granola sem açúcar com castanhas e sementes 500g', 27.50, 26, 'images/produtos/granola.jpg', FALSE, 13),
+('Grãos & Cia', 'Pão de queijo sem lactose', 'Pão de queijo congelado sem lactose 600g', 22.00, 32, 'images/produtos/pao-de-queijo.jpg', FALSE, 14)
+) AS v(marca, nome, descricao, preco, estoque_qtd, imagem_url, destaque, ord)
+JOIN marcas m ON m.nome = v.marca
+ORDER BY v.ord;
 
 INSERT INTO produto_categoria (produto_id, categoria_id)
 SELECT p.id, c.id
@@ -107,7 +108,7 @@ JOIN categorias c ON c.nome = v.categoria;
 
 INSERT INTO cupons (codigo, valor_desconto, tipo_desconto, minimo_subtotal, data_validade) VALUES
 ('BEMVINDO10', 10.00, 'percentual', 0, '2026-12-31'),
-('FRETEGRATIS', 15.00, 'fixo', 80.00, '2026-12-31'),
+('FRETEGRATIS', 0.00, 'frete', 80.00, '2026-12-31'),
 ('EXPIRADO10', 10.00, 'percentual', 0, '2026-10-31');
 
 INSERT INTO usuarios (nome, email, cpf, senha, preferencia, admin) VALUES
@@ -148,7 +149,7 @@ BEGIN
     SELECT id INTO id_kombucha FROM produtos WHERE nome = 'Kombucha de gengibre';
 
     INSERT INTO pedidos (usuario_id, cupom_id, subtotal, frete, desconto, total, status, forma_pagamento, cep_entrega)
-    VALUES (id_maria, id_cupom, 46.70, 12.50, 4.67, 54.53, 'pago', 'pix', '01001-000')
+    VALUES (id_maria, id_cupom, 46.70, 10.00, 4.67, 52.03, 'pago', 'pix', '01001-000')
     RETURNING id INTO pedido_pago;
 
     INSERT INTO pedidos (usuario_id, subtotal, frete, desconto, total, status, forma_pagamento, cep_entrega)

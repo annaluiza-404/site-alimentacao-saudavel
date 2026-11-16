@@ -22,3 +22,14 @@ def valida_cpf(cpf):
     soma = sum(int(x) * w for x, w in zip(d[:10], range(11, 1, -1)))
     dv2 = 0 if soma % 11 < 2 else 11 - soma % 11
     return int(d[10]) == dv2
+
+
+def normalizar_cep(cep):
+    digitos = re.sub(r'\D', '', str(cep or ''))
+    if len(digitos) != 8:
+        return None
+    return f'{digitos[:5]}-{digitos[5:]}'
+
+
+def valida_estado(estado):
+    return isinstance(estado, str) and bool(re.fullmatch(r'[A-Za-z]{2}', estado.strip()))

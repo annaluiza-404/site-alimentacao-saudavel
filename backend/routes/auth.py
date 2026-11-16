@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 
-from services.auth_service import registrar, logar, deslogar, usuario_logado
+from services.auth_service import (registrar, logar, deslogar, usuario_logado,
+                                   atualizar_usuario)
 
 bp_auth = Blueprint('auth', __name__)
 
@@ -29,3 +30,9 @@ def deslogar_usuario():
 @bp_auth.route('/me', methods=['GET'])
 def coletar_usuario():
     return jsonify({'usuario': usuario_logado()})
+
+
+@bp_auth.route('/usuarios/<int:id>', methods=['PUT'])
+def atualizar_dados_usuario(id):
+    dados = request.get_json(silent=True) or {}
+    return jsonify({'usuario': atualizar_usuario(id, dados)})

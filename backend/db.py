@@ -1,3 +1,4 @@
+import contextlib
 import psycopg2
 import psycopg2.extras
 from flask import g, current_app
@@ -19,11 +20,14 @@ def obter_db():
         }
         if cfg['host']:
             kwargs['host'] = cfg['host']
-        g.db = psycopg2.connect(**kwargs)
+        conexao = psycopg2.connect(**kwargs)
+        conexao.autocommit = False
+        g.db = conexao
     return g.db
 
 
 def fechar_db(_erro=None):
+    g.pop('em_transacao', None)
     db = g.pop('db', None)
     if db is not None:
         db.close()
@@ -31,10 +35,38 @@ def fechar_db(_erro=None):
 
 def query(sql, params=(), one=False):
     db = obter_db()
-    with db.cursor() as cur:
-        cur.execute(sql, params)
-        linhas = cur.fetchall() if cur.description else []
-    db.commit()
+    try:
+        with db.cursor() as cur:
+            cur.execute(sql, params)
+            linhas = cur.fetchall() if cur.description else []
+        if not g.get('em_transacao'):
+            db.commit()
+    except Exception:
+        if not g.get('em_transacao'):
+            db.rollback()
+        raise
     if one:
         return linhas[0] if linhas else None
     return linhas
+
+
+@contextlib.contextmanager
+def transacao():
+    """Bloco transacional explícito: COMMIT no sucesso, ROLLBACK em exceção.
+
+    O BEGIN é implícito (autocommit desligado). Enquanto o bloco estiver
+    aberto, query() não confirma sozinho, para não quebrar a atomicidade.
+    """
+    if g.get('em_transacao'):
+        raise RuntimeError('Transação aninhada não suportada')
+    db = obter_db()
+    g.em_transacao = True
+    try:
+        with db.cursor() as cur:
+            yield cur
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        g.em_transacao = False

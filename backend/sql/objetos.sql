@@ -53,6 +53,28 @@ AFTER INSERT ON itens_pedido
 FOR EACH ROW
 EXECUTE FUNCTION trg_fn_baixa_estoque_pedido();
 
+CREATE OR REPLACE FUNCTION trg_fn_repoe_estoque_cancelamento()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NEW.status = 'cancelado' AND OLD.status <> 'cancelado' THEN
+        UPDATE produtos p
+        SET estoque_qtd = p.estoque_qtd + i.quantidade
+        FROM itens_pedido i
+        WHERE i.pedido_id = NEW.id
+          AND p.id = i.produto_id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER trg_repoe_estoque_cancelamento
+AFTER UPDATE OF status ON pedidos
+FOR EACH ROW
+EXECUTE FUNCTION trg_fn_repoe_estoque_cancelamento();
+
 CREATE OR REPLACE VIEW vw_catalogo_disponivel AS
 SELECT
     p.id,
