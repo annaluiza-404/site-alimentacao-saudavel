@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chuchubot.css">
 </head>
 <body data-page="catalogo">
 <header>
@@ -39,6 +40,7 @@
         <div><h4>Buscar</h4><input id="q" type="search" placeholder="Ex.: pão, cookie…"></div>
         <div><h4>Restrições</h4><div id="tagF"></div></div>
         <div><h4>Categoria</h4><select id="cat"></select></div>
+        <div><h4>Marca</h4><select id="marcaF"><option value="">Todas</option></select></div>
         <div><h4>Preço até <b id="pv"></b></h4><input id="pr" type="range" min="10" max="60" step="1" value="60" style="padding:0;accent-color:var(--brand)"></div>
         <div><h4>Ordenar</h4><select id="ord"><option value="rel">Relevância</option><option value="asc">Menor preço</option><option value="desc">Maior preço</option><option value="az">Nome (A–Z)</option></select></div>
         <button class="btn ghost sm" id="clear">Limpar filtros</button>
@@ -87,5 +89,6 @@
     <script src="js/api.js"></script>
 <script src="js/data.js"></script>
     <script src="js/app.js"></script>
+<script src="js/chuchubot.js"></script>
 </body>
 </html>

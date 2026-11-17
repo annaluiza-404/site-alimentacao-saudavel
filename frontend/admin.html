@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Painel admin — Intolerância Zero</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chuchubot.css">
+    <style>
+        .painel{max-width:1000px;margin:28px auto}
+        .painel .tabs{margin-bottom:18px}
+        .barra{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+        .linha-admin{background:var(--soft);border-radius:12px;padding:12px;display:flex;gap:12px;
+            align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px;font-size:.92rem}
+        .linha-admin .acoes{display:flex;gap:6px;flex-wrap:wrap}
+        .linha-admin small{color:var(--muted)}
+        .form-produto{background:var(--soft);border-radius:var(--r);padding:16px;margin-bottom:18px}
+        .form-produto .dupla{display:flex;gap:10px;flex-wrap:wrap}
+        .form-produto .dupla>.field{flex:1;min-width:140px}
+        .checks{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+        .checks label{display:flex;align-items:center;gap:5px;font-size:.88rem}
+        .tag.inativo{background:#fbe4e4;color:#a12626}
+        .tag.zero{background:#fff3d6;color:#8a5a00}
+        .st-pendente{background:#fff3d6;color:#8a5a00}
+        .st-pago{background:var(--soft);color:var(--brand)}
+        .st-enviado{background:#e4eefb;color:#215a9c}
+        .st-entregue{background:#dcf5e6;color:#1c6b43}
+        .st-cancelado{background:#fbe4e4;color:#a12626}
+        .pedido-linha{align-items:flex-start}
+        .pedido-linha .itens{width:100%;border-top:1px dashed var(--line);padding-top:8px;display:flex;flex-direction:column;gap:4px}
+    </style>
+</head>
+<body data-page="admin">
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="index.html">
+      <img src="images/logo.png" alt="Logo Intolerância Zero" class="logo-img">
+      Intolerância Zero
+    </a>
+    <nav id="nav">
+      <a href="index.html">Início</a><a href="catalogo.html">Catálogo</a>
+      <a href="blog.html">Blog</a><a href="pedidos.html">Meus pedidos</a>
+      <a href="admin.html" class="on">Admin</a><a href="entrar.html" id="navLogin">Entrar</a>
+    </nav>
+    <div class="tools">
+      <button class="icon" id="cartBtn" aria-label="Carrinho">🛒<span class="badge" id="count">0</span></button>
+      <button class="icon menu-btn" id="menu" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap painel">
+    <h1>Painel administrativo</h1>
+    <p class="meta" id="adminInfo"></p>
+
+    <div class="tabs" id="adminTabs">
+      <button class="on" data-tab="produtos">Produtos</button>
+      <button data-tab="categorias">Categorias</button>
+      <button data-tab="marcas">Marcas</button>
+      <button data-tab="receitas">Receitas</button>
+      <button data-tab="pedidos">Pedidos</button>
+    </div>
+
+    <section id="tab-produtos">
+      <div class="barra">
+        <h2 style="margin:0">Produtos</h2>
+        <button class="btn" id="novoProduto">Novo produto</button>
+      </div>
+      <form class="form-produto" id="formProduto" hidden>
+        <input type="hidden" id="pr-id">
+        <div class="dupla">
+          <div class="field"><label for="pr-nome">Nome</label><input id="pr-nome" maxlength="100"></div>
+          <div class="field"><label for="pr-marca">Marca</label><select id="pr-marca"></select></div>
+        </div>
+        <div class="field"><label for="pr-desc">Descrição</label><input id="pr-desc" maxlength="500"></div>
+        <div class="dupla">
+          <div class="field"><label for="pr-preco">Preço (R$)</label><input id="pr-preco" type="number" step="0.01" min="0"></div>
+          <div class="field"><label for="pr-estoque">Estoque</label><input id="pr-estoque" type="number" step="1" min="0"></div>
+          <div class="field"><label for="pr-img">Imagem (jpg/png/webp, até 2MB)</label><input id="pr-img" type="file" accept=".jpg,.jpeg,.png,.webp"></div>
+        </div>
+        <div class="field"><label>Categorias</label><div class="checks" id="pr-cats"></div></div>
+        <label class="check" style="display:flex;gap:6px;align-items:center;margin-bottom:14px">
+          <input type="checkbox" id="pr-destaque"> Exibir nos destaques da home
+        </label>
+        <div class="row" style="gap:8px">
+          <button type="submit" class="btn">Salvar</button>
+          <button type="button" class="btn ghost" id="cancelarProduto">Cancelar</button>
+        </div>
+      </form>
+      <div id="listaProdutos"></div>
+    </section>
+
+    <section id="tab-categorias" hidden>
+      <div class="barra"><h2 style="margin:0">Categorias</h2></div>
+      <form id="formCategoria" class="form-produto">
+        <div class="dupla">
+          <div class="field"><label for="cat-nome">Nome</label><input id="cat-nome" maxlength="100"></div>
+          <div class="field"><label for="cat-tipo">Tipo</label>
+            <select id="cat-tipo"><option value="produto">Produto</option><option value="restricao">Restrição</option></select></div>
+        </div>
+        <button class="btn">Adicionar categoria</button>
+      </form>
+      <div id="listaCategorias"></div>
+    </section>
+
+    <section id="tab-marcas" hidden>
+      <div class="barra"><h2 style="margin:0">Marcas</h2></div>
+      <form id="formMarca" class="form-produto">
+        <div class="field"><label for="marca-nome">Nome</label><input id="marca-nome" maxlength="100"></div>
+        <button class="btn">Adicionar marca</button>
+      </form>
+      <div id="listaMarcas"></div>
+    </section>
+
+
+    <section id="tab-receitas" hidden>
+      <div class="barra">
+        <h2 style="margin:0">Receitas e posts</h2>
+        <button class="btn" id="novaReceita">Nova receita</button>
+      </div>
+      <form class="form-produto" id="formReceita" hidden>
+        <input type="hidden" id="rc-id">
+        <div class="dupla">
+          <div class="field"><label for="rc-titulo">Título</label><input id="rc-titulo" maxlength="150"></div>
+          <div class="field"><label for="rc-cat">Categoria</label><input id="rc-cat" maxlength="50" placeholder="Receitas, Guia, Dicas..."></div>
+        </div>
+        <div class="field"><label for="rc-texto">Texto (separe parágrafos com linha em branco)</label>
+          <textarea id="rc-texto" rows="7" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit"></textarea></div>
+        <div class="field"><label for="rc-imagem">Imagem (caminho ou URL)</label>
+          <input id="rc-imagem" placeholder="images/blog/minha-receita.jpg"></div>
+        <div class="field"><label>Ingredientes</label>
+          <div id="rc-ings"></div>
+          <button type="button" class="btn sm ghost" id="rc-add-ing">Adicionar ingrediente</button></div>
+        <div class="row" style="gap:8px">
+          <button class="btn">Salvar</button>
+          <button type="button" class="btn ghost" id="rc-cancelar">Cancelar</button>
+        </div>
+      </form>
+      <div id="listaReceitas"></div>
+    </section>
+    <section id="tab-pedidos" hidden>
+      <div class="barra"><h2 style="margin:0">Pedidos</h2><button class="btn ghost" id="recarregarPedidos">Atualizar</button></div>
+      <div id="listaPedidos"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+    <div class="wrap">
+        <div><h4>Intolerância Zero</h4><p>Alimentação saudável sem restrições.</p></div>
+        <div><h4>Navegue</h4><a href="catalogo.html">Catálogo</a><br><a href="blog.html">Blog</a><br><a href="entrar.html">Minha conta</a></div>
+        <div><h4>Atendimento</h4><p>contato@intoleranciazero.com.br</p><p>Seg a sex, 9h às 18h</p></div>
+    </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+    <div class="row"><h2 style="margin:0">Seu carrinho</h2><button class="icon" id="closeCart" aria-label="Fechar">✕</button></div>
+    <div class="list" id="cartList"></div>
+    <div class="row" style="margin:14px 0"><b>Total</b><b id="total" style="font-size:1.3rem"></b></div>
+    <button class="btn" id="checkout" style="justify-content:center">Finalizar compra</button>
+</aside>
+<div class="toast" id="toast"></div>
+
+<script src="js/env.js"></script>
+<script src="js/api.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script src="js/chuchubot.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
