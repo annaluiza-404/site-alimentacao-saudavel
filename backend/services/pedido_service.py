@@ -184,6 +184,7 @@ def _formatar(linha):
     return {
         'id': linha['id'],
         'usuario_id': linha['usuario_id'],
+        'usuario_nome': linha.get('usuario_nome'),
         'cupom_id': linha['cupom_id'],
         'subtotal': float(linha['subtotal']),
         'frete': float(linha['frete']),

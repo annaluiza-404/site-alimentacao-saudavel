@@ -29,6 +29,11 @@ def listar(q, tags, cat, pr_max, ordem, marca, destaque):
     return [_formatar(l) for l in produto_repo.listar(filtros)]
 
 
+def listar_todos():
+    sessao.exigir_admin()
+    return [_formatar_admin(l) for l in produto_repo.listar_todos()]
+
+
 def listar_destaques():
     return [_formatar(l) for l in produto_repo.listar({'destaque': True})]
 
@@ -75,6 +80,17 @@ def excluir(produto_id):
         raise ApiErro('Produto não encontrado', 404)
     produto_repo.desativar(produto_id)
     return {'mensagem': 'Produto removido do catálogo'}
+
+
+def reativar(produto_id):
+    sessao.exigir_admin()
+    produto = produto_repo.obter(produto_id)
+    if produto is None:
+        raise ApiErro('Produto não encontrado', 404)
+    if produto['ativo']:
+        raise ApiErro('Produto já está ativo', 400)
+    produto_repo.reativar(produto_id)
+    return {'mensagem': 'Produto reativado no catálogo'}
 
 
 def listar_categorias():
@@ -221,3 +237,19 @@ def _formatar(linha):
 
 def _categoria_formatada(linha):
     return {'id': linha['id'], 'nome': linha['nome'], 'tipo': linha['tipo']}
+
+
+def _formatar_admin(linha):
+    return {
+        'id': linha['id'],
+        'nome': linha['nome'],
+        'descricao': linha['descricao'],
+        'preco': float(linha['preco']),
+        'estoque': linha['estoque_qtd'],
+        'marca': linha['nome_marca'],
+        'imagem': linha['imagem_url'],
+        'destaque': linha['destaque'],
+        'ativo': linha['ativo'],
+        'categorias': [n for n in (linha.get('categorias') or '').split('|') if n],
+        'categoria_ids': list(linha.get('categoria_ids') or [])
+    }

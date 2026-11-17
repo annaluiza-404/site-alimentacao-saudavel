@@ -21,6 +21,11 @@ def coletar_produto(id):
     return jsonify({'produto': produto_service.detalhar(id)})
 
 
+@bp_catalogo.route('/produtos/todos', methods=['GET'])
+def coletar_todos_produtos():
+    return jsonify({'produtos': produto_service.listar_todos()})
+
+
 @bp_catalogo.route('/produtos/destaques', methods=['GET'])
 def coletar_produtos_destaques():
     return jsonify({'produtos': produto_service.listar_destaques()})
@@ -38,6 +43,11 @@ def atualizar_produto(id):
     dados = request.form
     imagem = _imagem(request)
     return jsonify({'produto': produto_service.atualizar(id, dados, imagem)})
+
+
+@bp_catalogo.route('/produtos/<int:id>/reativar', methods=['PUT'])
+def reativar_produto(id):
+    return jsonify(produto_service.reativar(id))
 
 
 @bp_catalogo.route('/produtos/<int:id>', methods=['DELETE'])
