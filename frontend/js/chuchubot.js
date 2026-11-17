@@ -73,6 +73,7 @@
   const $c=s=>root.querySelector(s);
   const msgs=$c(".cb-msgs"),input=$c(".cb-form input"),sugs=$c(".cb-sugs");
   let started=false;
+  const historico=[];
 
   function addMsg(text,who,link){
     const m=document.createElement("div");
@@ -90,11 +91,21 @@
     m.innerHTML=`<span class="cb-ava">${avatarHTML()}</span><div class="cb-txt"><i></i><i></i><i></i></div>`;
     msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;return m;
   }
-  function enviar(txt){
+  async function enviar(txt){
     txt=txt.trim();if(!txt)return;
     addMsg(txt,"me");input.value="";sugs.hidden=true;
-    const t=typing(),r=responder(txt);
-    setTimeout(()=>{t.remove();addMsg(r.t,"bot",r.l)},600+Math.random()*500);
+    const t=typing();
+    try{
+      const d=await apiFetch("/api/chatbot",{metodo:"POST",corpo:{
+        pergunta:txt,historico:historico.slice(-6)}});
+      t.remove();
+      addMsg(d.resposta,"bot");
+      historico.push({papel:"user",conteudo:txt},{papel:"bot",conteudo:d.resposta});
+    }catch(e){
+      t.remove();
+      const r=responder(txt);
+      addMsg(r.t,"bot",r.l);
+    }
   }
   function abrir(o){
     root.classList.toggle("open",o);

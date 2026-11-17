@@ -1,8 +1,10 @@
 const API = (window.ENV && window.ENV.API) || "http://localhost:8000";
 
-async function apiFetch(caminho, { metodo = "GET", corpo = null } = {}) {
+async function apiFetch(caminho, { metodo = "GET", corpo = null, formData = null } = {}) {
   const opcoes = { method: metodo, credentials: "include", headers: {} };
-  if (corpo !== null) {
+  if (formData !== null) {
+    opcoes.body = formData;
+  } else if (corpo !== null) {
     opcoes.headers["Content-Type"] = "application/json";
     opcoes.body = JSON.stringify(corpo);
   }

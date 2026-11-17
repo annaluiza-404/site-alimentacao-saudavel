@@ -19,23 +19,30 @@ let cart=store.get("iz_cart")||[],user=store.get("iz_user");
 const CODIGO_TAG=Object.fromEntries(Object.entries(TAGS).map(([k,v])=>[v,k]));
 const EMOJI_CAT={"Pães e massas":"🍞","Doces e biscoitos":"🍪","Snacks":"🥨","Bebidas":"🥛","Mercearia":"🌾"};
 const urlImagem=img=>!img?"":(/^https?:/.test(img)?img:(img.startsWith("uploads/")?API+"/"+img:img));
-const rotulo=p=>p.c>=0?CATS[p.c]:(p.marca||"");
-let PRODUTOS=[];
+const rotulo=p=>p.cat||p.marca||"";
+let PRODUTOS=[],CATEGORIAS_API=[],MARCAS_API=[],RECEITAS=[];
 
 function mapProduto(p){
  const cats=p.categorias||[];
- const catProd=cats.find(c=>CATS.includes(c))||"";
+ const catProd=cats.find(c=>EMOJI_CAT[c])||"";
  return {id:p.id,n:p.nome,p:p.preco,estoque:p.estoque,img:urlImagem(p.imagem),
-  e:EMOJI_CAT[catProd]||"🌿",t:cats.map(c=>CODIGO_TAG[c]).filter(Boolean),
-  c:CATS.indexOf(catProd),marca:p.marca,destaque:p.destaque};
+  e:EMOJI_CAT[catProd]||"🌿",cats:cats,cat:catProd,marca:p.marca,destaque:p.destaque};
 }
 async function carregarProdutos(){const d=await apiFetch("/api/produtos");PRODUTOS=(d.produtos||[]).map(mapProduto);return PRODUTOS}
+async function carregarCatalogos(){
+ try{
+  const [c,m]=await Promise.all([apiFetch("/api/categorias"),apiFetch("/api/marcas")]);
+  CATEGORIAS_API=c.categorias||[];MARCAS_API=m.marcas||[];
+ }catch(e){CATEGORIAS_API=[];MARCAS_API=[]}
+}
+async function carregarReceitas(){try{const d=await apiFetch("/api/receitas");RECEITAS=d.receitas||[]}catch(e){RECEITAS=[]}return RECEITAS}
 const acharProduto=id=>PRODUTOS.find(x=>x.id===id);
 
+const restricoesDe=p=>(p.cats||[]).filter(n=>Object.values(TAGS).includes(n));
 const card=p=>`<div class="card"><div class="img">${pic(p.img,p.e,p.n)}</div><div class="body"><small>${rotulo(p)}</small><h3>${p.n}</h3>
-<div class="tags">${p.t.slice(0,3).map(k=>`<span class="tag">${TAGS[k]}</span>`).join("")}</div>
+<div class="tags">${(restricoesDe(p).length?restricoesDe(p):(p.cats||[])).slice(0,3).map(n=>`<span class="tag">${n}</span>`).join("")}</div>
 <div class="row price"><span>${brl(p.p)}</span><button class="btn sm" data-add="${p.id}">Adicionar</button></div></div></div>`;
-const postCard=b=>`<a class="card post" href="post.html?id=${b.id}"><div class="img">${pic(b.img,b.e,b.t)}</div><div class="body"><span class="tag" style="align-self:flex-start">${b.cat}</span><h3>${b.t}</h3><small>${b.d}</small></div></a>`;
+const receitaCard=r=>`<a class="card post" href="post.html?id=${r.id}"><div class="img">${pic(urlImagem(r.imagem),"📖",r.titulo)}</div><div class="body"><span class="tag" style="align-self:flex-start">${r.categoria}</span><h3>${r.titulo}</h3><small>${dataBR(r.criado_em)}</small></div></a>`;
 
 function renderCart(){
     $("#count").textContent=cart.reduce((s,i)=>s+i.q,0);
@@ -179,6 +186,7 @@ function authUI(){
  if(!$("#authBox"))return;
  $("#authBox").hidden=!!user;$("#userBox").hidden=!user;
  if(user){$("#hello").textContent="Olá, "+user.name.split(" ")[0]+"!";$("#uinfo").textContent=user.email+" · Preferência: "+(user.r||"—")+(user.cpf?"":" · CPF pendente")}
+ if($("#adminLink"))$("#adminLink").hidden=!(user&&user.admin)
 }
 async function carregarSessao(){
  try{const d=await apiFetch("/api/me");user={id:d.usuario.id,name:d.usuario.nome,email:d.usuario.email,admin:d.usuario.admin,cpf:d.usuario.cpf,r:d.usuario.preferencia};store.set("iz_user",user)}
@@ -197,36 +205,46 @@ $("#chips").innerHTML=[
  const destaques=PRODUTOS.filter(p=>p.destaque);
  $("#featured").innerHTML=(destaques.length?destaques:PRODUTOS.slice(0,4)).map(card).join("");
  const homeBlog=$("#homeBlog");
- if(homeBlog)homeBlog.innerHTML=POSTS.slice(0,3).map(postCard).join("");
+ if(homeBlog)homeBlog.innerHTML=RECEITAS.slice(0,3).map(receitaCard).join("");
  const newsForm=$("#newsForm");
  if(newsForm)newsForm.onsubmit=e=>{e.preventDefault();e.target.reset();toast("Inscrição confirmada! 💌")};
 }
 
 function initShop(){
  const u=new URLSearchParams(location.search);
- const fresh=()=>({tags:new Set(u.get("tag")&&TAGS[u.get("tag")]?[u.get("tag")]:[]),cat:"",q:u.get("q")||"",pr:60,ord:"rel"});
+ const restricoes=CATEGORIAS_API.filter(c=>c.tipo==="restricao").map(c=>c.nome);
+ const catsProduto=CATEGORIAS_API.filter(c=>c.tipo==="produto").map(c=>c.nome);
+ const listaRestr=restricoes.length?restricoes:Object.values(TAGS);
+ const listaCats=catsProduto.length?catsProduto:CATS;
+ const listaMarcas=MARCAS_API.length?MARCAS_API.map(m=>m.nome):[...new Set(PRODUTOS.map(p=>p.marca))];
+ const tagInicial=u.get("tag")&&TAGS[u.get("tag")]?TAGS[u.get("tag")]:"";
+ const fresh=()=>({tags:new Set(tagInicial?[tagInicial]:[]),cat:"",marca:"",q:u.get("q")||"",pr:60,ord:"rel"});
  let st=fresh();
+ const semAcento=v=>v.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 
-const drawF=()=>{
-  $("#tagF").innerHTML=Object.entries(TAGS).map(([k,v])=>`<label class="check"><input type="checkbox" value="${k}" ${st.tags.has(k)?"checked":""}> ${v}</label>`).join("");
-  $("#cat").innerHTML=`<option value="">Todas</option>`+CATS.map((c,i)=>`<option value="${i}" ${String(i)===st.cat?"selected":""}>${c}</option>`).join("");
+ const drawF=()=>{
+  $("#tagF").innerHTML=listaRestr.map(nome=>`<label class="check"><input type="checkbox" value="${nome}" ${st.tags.has(nome)?"checked":""}> ${nome}</label>`).join("");
+  $("#cat").innerHTML=`<option value="">Todas</option>`+listaCats.map(c=>`<option value="${c}" ${c===st.cat?"selected":""}>${c}</option>`).join("");
+  if($("#marcaF"))$("#marcaF").innerHTML=`<option value="">Todas</option>`+listaMarcas.map(m=>`<option value="${m}" ${m===st.marca?"selected":""}>${m}</option>`).join("");
   $("#q").value=st.q;$("#pr").value=st.pr;$("#ord").value=st.ord;$("#pv").textContent=brl(+st.pr)};
- 
+
  const drawL=()=>{
-  const semAcento=v=>v.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
-  let r=PRODUTOS.filter(p=>[...st.tags].every(t=>p.t.includes(t))&&(st.cat===""||p.c===+st.cat)&&p.p<=st.pr&&semAcento(p.n).includes(semAcento(st.q)));
+  let r=PRODUTOS.filter(p=>[...st.tags].every(t=>p.cats.includes(t))
+    &&(st.cat===""||p.cat===st.cat)
+    &&(st.marca===""||p.marca===st.marca)
+    &&p.p<=st.pr&&semAcento(p.n).includes(semAcento(st.q)));
   if(st.ord==="asc")r.sort((a,b)=>a.p-b.p);if(st.ord==="desc")r.sort((a,b)=>b.p-a.p);if(st.ord==="az")r.sort((a,b)=>a.n.localeCompare(b.n,"pt-BR"));
   $("#res").textContent=r.length+(r.length===1?" produto encontrado":" produtos encontrados");
   $("#list").innerHTML=r.length?r.map(card).join(""):`<div class="empty">😕 Nenhum produto com esses filtros.<br>Tente remover alguma restrição.</div>`};
  $("#tagF").addEventListener("change",e=>{e.target.checked?st.tags.add(e.target.value):st.tags.delete(e.target.value);drawL()});
  $("#cat").onchange=e=>{st.cat=e.target.value;drawL()};
+ if($("#marcaF"))$("#marcaF").onchange=e=>{st.marca=e.target.value;drawL()};
  $("#q").oninput=e=>{st.q=e.target.value;drawL()};
  $("#pr").oninput=e=>{st.pr=+e.target.value;$("#pv").textContent=brl(st.pr);drawL()};
  $("#ord").onchange=e=>{st.ord=e.target.value;drawL()};
- $("#clear").onclick=()=>{st={tags:new Set(),cat:"",q:"",pr:60,ord:"rel"};drawF();drawL()};
+ $("#clear").onclick=()=>{st={tags:new Set(),cat:"",marca:"",q:"",pr:60,ord:"rel"};drawF();drawL()};
  drawF();drawL();
 }
-
 function initAuth(){
  const err=(el,m)=>{el.parentElement.querySelector(".err").textContent=m||"";return !m};
  const okMail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -255,13 +273,27 @@ function initAuth(){
    store.set("iz_user",user);authUI();preencherPerfil();toast("Dados salvos ✔");
   }catch(ex){toast(ex.message)}};
 }
-function initBlog(){$("#blogList").innerHTML=POSTS.map(postCard).join("")}
-function initPost(){
- const b=POSTS.find(x=>x.id===+new URLSearchParams(location.search).get("id"));
- if(b)document.title=b.t+" — Intolerância Zero";
- $("#article").innerHTML=b?`<a class="back" href="blog.html">← Voltar ao blog</a><div class="cover">${pic(b.img,b.e,b.t)}</div><span class="tag">${b.cat}</span><h1 style="margin-top:12px">${b.t}</h1><p class="meta">${b.d} · Equipe Intolerância Zero</p>${b.ps.map(x=>`<p>${x}</p>`).join("")}<p><a class="btn" href="catalogo.html">Ver produtos relacionados</a></p>`:`<a class="back" href="blog.html">← Blog</a><p>Post não encontrado.</p>`;
+function initBlog(){$("#blogList").innerHTML=RECEITAS.length?RECEITAS.map(receitaCard).join(""):`<div class="empty">Nenhuma receita publicada ainda.</div>`}
+async function initPost(){
+ const id=+new URLSearchParams(location.search).get("id");
+ const alvo=$("#article");
+ try{
+  const d=await apiFetch("/api/receitas/"+id);
+  const r=d.receita;
+  document.title=r.titulo+" — Intolerância Zero";
+  const paragrafos=(r.texto||"").split(/\n+/).filter(Boolean).map(x=>`<p>${x}</p>`).join("");
+  const ings=(r.ingredientes||[]);
+  alvo.innerHTML=`<a class="back" href="blog.html">← Voltar ao blog</a>
+   <div class="cover">${pic(urlImagem(r.imagem),"📖",r.titulo)}</div>
+   <span class="tag">${r.categoria}</span><h1 style="margin-top:12px">${r.titulo}</h1>
+   <p class="meta">${dataBR(r.criado_em)} · Equipe Intolerância Zero</p>${paragrafos}
+   ${ings.length?`<h2 style="margin-top:22px">Ingredientes</h2><ul>${
+     ings.map(i=>`<li><a href="catalogo.html?q=${encodeURIComponent(i.produto)}">${i.produto}</a> (${i.quantidade})</li>`).join("")}</ul>`:""}
+   <p><a class="btn" href="catalogo.html">Ver produtos</a></p>`;
+ }catch(e){
+  alvo.innerHTML=`<a class="back" href="blog.html">← Blog</a><p>Post não encontrado.</p>`;
+ }
 }
-
 const dataBR=iso=>{try{return new Date(iso).toLocaleDateString("pt-BR")}catch(e){return iso}};
 const STATUS_LABEL={pendente:"Pendente",pago:"Pago",enviado:"Enviado",entregue:"Entregue",cancelado:"Cancelado"};
 
@@ -296,7 +328,7 @@ async function initPedidos(){
 
 (async()=>{
  renderCart();authUI();await carregarSessao();
- try{await carregarProdutos()}catch(e){}
+ await Promise.all([carregarProdutos().catch(()=>[]),carregarCatalogos(),carregarReceitas()]);
  ({inicio:initHome,catalogo:initShop,entrar:initAuth,blog:initBlog,post:initPost,pedidos:initPedidos}[document.body.dataset.page]||(()=>{}))();
  renderCart();
  const flash=store.get("iz_flash");if(flash){store.set("iz_flash",null);toast(flash)}
