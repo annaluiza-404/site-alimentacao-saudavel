@@ -77,7 +77,7 @@ Abrir `http://localhost:5000`.
 
 ## Configuração
 
-- **Backend:** `backend/.env` (veja `backend/.env.example`): credenciais do banco + `SECRET_KEY`.
+- **Backend:** `backend/.env` (veja `backend/.env.example`): credenciais do banco, `SECRET_KEY` e, opcionalmente, `OPENAI_API_KEY` + `OPENAI_MODEL` (padrão `gpt-4o-mini`) para o chatbot. Sem a chave, o ChuchuBot responde com as respostas locais pré-definidas.
 - **Frontend:** `frontend/js/env.js`: endereço da API (`window.ENV.API`).
 
 As portas precisam bater: a API sobe na 8000 e o CORS do backend aceita origem `http://localhost:5000`.
@@ -112,10 +112,11 @@ Formas de pagamento: `pix`, `cartao`, `boleto`. O desconto do cupom é aplicado 
 |:--|:--|
 | Auth | `POST /api/registro`, `POST /api/login`, `POST /api/logout`, `GET /api/me`, `PUT /api/usuarios/<id>` (dono ou admin) |
 | Catálogo | `GET /api/produtos` (`q`, `tags`, `cat`, `pr_max`, `ord`, `marca`, `destaque`), `GET /api/produtos/<id>`, `GET /api/produtos/destaques` |
-| Catálogo (admin) | `POST/PUT/DELETE /api/produtos` (multipart com campo `imagem`), CRUD de `/api/categorias` e `/api/marcas` |
+| Catálogo (admin) | `GET /api/produtos/todos` (inclui inativos), `POST/PUT/DELETE /api/produtos` (multipart com campo `imagem`), `PUT /api/produtos/<id>/reativar`, CRUD de `/api/categorias` e `/api/marcas` |
 | Frete e cupom | `POST /api/frete` (`cep`), `POST /api/cupom/validar` (`codigo`, `subtotal`, `frete` ou `cep`) |
 | Pedidos | `GET/POST /api/pedidos`, `GET/DELETE /api/pedidos/<id>`, `PUT /api/pedidos/<id>/status` (admin) |
 | Receitas | `GET /api/receitas?produto_id=<id>`, `GET /api/receitas/<id>`, `POST/PUT/DELETE /api/receitas/<id>` (admin) |
+| Chatbot | `POST /api/chatbot` (`pergunta`, `historico` opcional), usando OpenAI `gpt-4o-mini` quando `OPENAI_API_KEY` está configurada |
 | Imagens | `GET /uploads/<caminho>` |
 
 Regras de acesso: escrita de catálogo, receitas e status de pedido exige admin; pedidos são visíveis apenas para o dono (admin vê todos). O checkout roda em transação única (COMMIT no sucesso, ROLLBACK em erro) e o estoque é controlado por triggers.
@@ -139,15 +140,17 @@ backend/
   uploads/          # imagens de produtos enviadas
 frontend/
   index.html        # home com destaques da API
-  catalogo.html     # catálogo com filtros
+  catalogo.html     # catálogo com filtros (restrição, categoria, marca, preço, ordenação)
   entrar.html       # login, cadastro e edição de perfil (CPF)
   pedidos.html      # meus pedidos (itens e cancelamento)
-  blog.html / post.html  # blog de receitas
+  admin.html        # painel admin (produtos, categorias, marcas, pedidos)
+  blog.html / post.html  # receitas e posts de conteúdo (via /api/receitas)
   js/
     env.js          # configuração (URL da API)
     api.js          # fetch com cookies de sessão
     app.js          # catálogo, carrinho, checkout e pedidos
-    data.js         # TAGs, categorias, posts do blog e emojis
+    data.js         # TAGs, categorias e emojis (fallbacks do catálogo)
     chuchubot.js    # chatbot do site
+    admin.js        # painel administrativo
   css/
 ``` 

@@ -23,3 +23,7 @@ def carregar(app):
         'senha': os.environ.get('DB_PASS', 'iz_dev_password')
     }
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'iz-dev-secret-key')
+    app.config['OPENAI'] = {
+        'chave': os.environ.get('OPENAI_API_KEY', ''),
+        'modelo': os.environ.get('OPENAI_MODEL', 'gpt-4o-mini')
+    }
