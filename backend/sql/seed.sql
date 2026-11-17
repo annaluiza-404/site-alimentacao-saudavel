@@ -175,8 +175,11 @@ EXCEPTION
 END $$;
 
 INSERT INTO receitas (titulo, categoria, texto, imagem) VALUES
-('5 cafés da manhã sem glúten e sem lactose', 'Receitas', 'Panqueca de banana com aveia certificada, tapioca recheada, mingau de arroz com canela, torradas de pão de arroz com pasta de amendoim e vitamina de bebida vegetal. Todas ficam prontas em menos de 15 minutos.', 'images/blog/cafe-manha.jpg'),
-('Granola crocante com pasta de amendoim', 'Receitas', 'Misture a granola sem açúcar com a pasta de amendoim e leve ao forno por 10 minutos para ficar crocante. Sirva com bebida vegetal gelada.', 'images/blog/despensa.jpg');
+('Glúten, lactose ou alergia? Entenda as diferenças', 'Guia', E'Intolerância, alergia e doença celíaca costumam ser confundidas, mas funcionam de formas bem diferentes no corpo. A intolerância à lactose, por exemplo, vem da falta da enzima lactase e causa desconforto digestivo.\n\nJá a alergia envolve o sistema imunológico e pode ser grave. Em caso de sintomas recorrentes, procure um médico para um diagnóstico correto antes de cortar alimentos por conta própria.', 'images/blog/gluten-ou-alergia.jpg'),
+('5 cafés da manhã sem glúten e sem lactose', 'Receitas', E'Panqueca de banana com aveia certificada, tapioca recheada, mingau de arroz com canela, torradas de pão de arroz com pasta de amendoim e vitamina de bebida vegetal.\n\nTodas ficam prontas em menos de 15 minutos e usam ingredientes que você encontra aqui na loja.', 'images/blog/cafe-manha.jpg'),
+('Como ler rótulos sem cair em pegadinhas', 'Dicas', E'Procure a frase de alerta obrigatória, mas também fique atento a termos como caseína, soro de leite, malte e extrato de cevada, que podem indicar lactose ou glúten.\n\nNa dúvida, escolha produtos com selo de certificação e prefira fabricantes que informam o risco de contaminação cruzada.', 'images/blog/rotulo.jpg'),
+('Montando uma despensa segura em casa', 'Bem-estar', E'Separe utensílios e prateleiras para evitar contaminação cruzada, principalmente se a casa tem pessoas sem restrição.\n\nComece pelo básico: farinhas alternativas, bebida vegetal, uma boa pasta de oleaginosas e snacks para emergências.', 'images/blog/despensa.jpg'),
+('Granola crocante com pasta de amendoim', 'Receitas', E'Misture a granola sem açúcar com a pasta de amendoim e leve ao forno por 10 minutos para ficar crocante.\n\nSirva com bebida vegetal gelada.', 'images/blog/despensa.jpg');
 
 INSERT INTO ingrediente_receita (receita_id, produto_id, quantidade)
 SELECT r.id, p.id, v.quantidade

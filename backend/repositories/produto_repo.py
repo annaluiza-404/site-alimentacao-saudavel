@@ -82,6 +82,11 @@ def desativar(produto_id, cur=None):
                     (produto_id,), one=True, cur=cur)
 
 
+def reativar(produto_id, cur=None):
+    return executar('UPDATE produtos SET ativo = TRUE WHERE id = %s RETURNING id',
+                    (produto_id,), one=True, cur=cur)
+
+
 def vincular_categorias(produto_id, categoria_ids, cur=None):
     for cat_id in categoria_ids:
         executar('INSERT INTO produto_categoria (produto_id, categoria_id) '
@@ -105,3 +110,16 @@ def nome_existe(nome, exceto_id=None, cur=None):
         return executar('SELECT 1 FROM produtos WHERE nome = %s AND id <> %s',
                         (nome, exceto_id), one=True, cur=cur)
     return executar('SELECT 1 FROM produtos WHERE nome = %s', (nome,), one=True, cur=cur)
+
+
+def listar_todos(cur=None):
+    return executar(
+        'SELECT p.id, p.nome, p.descricao, p.preco, p.estoque_qtd, p.imagem_url, '
+        'p.destaque, p.ativo, m.nome AS nome_marca, '
+        '(SELECT string_agg(c.nome, \'|\' ORDER BY c.nome) FROM produto_categoria pc '
+        'JOIN categorias c ON c.id = pc.categoria_id '
+        'WHERE pc.produto_id = p.id) AS categorias, '
+        '(SELECT array_agg(pc.categoria_id) FROM produto_categoria pc '
+        'WHERE pc.produto_id = p.id) AS categoria_ids '
+        'FROM produtos p JOIN marcas m ON m.id = p.marca_id ORDER BY p.id',
+        cur=cur)

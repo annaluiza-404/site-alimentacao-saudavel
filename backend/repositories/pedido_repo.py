@@ -22,12 +22,15 @@ def inserir_item(pedido_id, produto_id, quantidade, preco_unitario, cur=None):
 
 
 def listar(usuario_id=None, cur=None):
-    sql = f'SELECT {COLUNAS} FROM pedidos'
+    sql = ('SELECT p.id, p.usuario_id, p.cupom_id, p.subtotal, p.frete, '
+           'p.desconto, p.total, p.status, p.forma_pagamento, p.cep_entrega, '
+           'p.criado_em, u.nome AS usuario_nome '
+           'FROM pedidos p JOIN usuarios u ON u.id = p.usuario_id')
     params = ()
     if usuario_id:
-        sql += ' WHERE usuario_id = %s'
+        sql += ' WHERE p.usuario_id = %s'
         params = (usuario_id,)
-    sql += ' ORDER BY criado_em DESC, id DESC'
+    sql += ' ORDER BY p.criado_em DESC, p.id DESC'
     return executar(sql, params, cur=cur)
 
 
